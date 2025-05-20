@@ -25,8 +25,22 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         await client.connect();
-
         const taskCollection = client.db('AllTasks').collection('tasks');
+        const usersCollection = client.db('AllTasks').collection('loggedUser');
+
+        app.post('/users', async (req, res) => {
+            const userInfo = req.body;
+            console.log(userInfo);
+            const result = await usersCollection.insertOne(userInfo);
+            res.send(result)
+        })
+
+        app.get('/myPostedTasks/:uid', async (req, res) => {
+            const uid = req.params.uid;
+            const query = { uid: uid };
+            const tasks = await taskCollection.find(query).toArray();
+            res.send(tasks);
+        });
 
         app.post('/allTasks', async (req, res) => {
             const task = req.body;
@@ -38,10 +52,14 @@ async function run() {
             const result = await taskCollection.find({}).sort({ deadline: -1 }).limit(6).toArray();
             res.send(result);
         });
+        app.get('/browseTask', async (req, res) => {
+            const result = await taskCollection.find().toArray();
+            res.send(result);
+        });
 
-        app.get('/browseTask/:id', async(req, res) => {
+        app.get('/browseTask/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await taskCollection.findOne(query);
             res.send(result)
         })
