@@ -48,16 +48,22 @@ async function run() {
             const updateBidsCount = req.body.bidsCount;
             console.log(updateBidsCount);
             const filter = {_id: new ObjectId(id)};
-
             const updateDoc = {
                 $set: {
                     bidsCount: updateBidsCount
                 }
             }
-
             const result = await taskCollection.updateOne(filter, updateDoc);
             res.send(result)
         });
+
+        // delete userAdded Tasks
+        app.delete('/allTasks/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await taskCollection.deleteOne(query);
+            res.send(result)
+        })
 
         app.post('/allTasks', async (req, res) => {
             const task = req.body;
@@ -76,6 +82,20 @@ async function run() {
             const result = await taskCollection.findOne(query)
             res.send(result);
         });
+
+        // update the full user task data
+        app.put('/allTasks/:id', async(req, res) => {
+            const id = req.params.id;
+            const newUserData = req.body;
+            const query = {_id: new ObjectId(id)};
+            const updateDoc = {
+                $set: newUserData
+            }
+
+            const result = await taskCollection.updateOne(query, updateDoc);
+            res.send(result)
+        })
+
         app.get('/browseTask', async (req, res) => {
             const result = await taskCollection.find().toArray();
             res.send(result);
