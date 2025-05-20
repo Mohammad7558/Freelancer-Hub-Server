@@ -42,6 +42,23 @@ async function run() {
             res.send(tasks);
         });
 
+        // update bidsCount 
+        app.patch('/allTasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateBidsCount = req.body.bidsCount;
+            console.log(updateBidsCount);
+            const filter = {_id: new ObjectId(id)};
+
+            const updateDoc = {
+                $set: {
+                    bidsCount: updateBidsCount
+                }
+            }
+
+            const result = await taskCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        });
+
         app.post('/allTasks', async (req, res) => {
             const task = req.body;
             const result = await taskCollection.insertOne(task);
@@ -50,6 +67,13 @@ async function run() {
 
         app.get('/allTasks', async (req, res) => {
             const result = await taskCollection.find({}).sort({ deadline: -1 }).limit(6).toArray();
+            res.send(result);
+        });
+
+        app.get('/allTasks/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await taskCollection.findOne(query)
             res.send(result);
         });
         app.get('/browseTask', async (req, res) => {
