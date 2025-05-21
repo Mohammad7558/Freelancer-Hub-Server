@@ -73,6 +73,7 @@ async function run() {
             const result = await taskCollection.findOne(query)
             res.send(result);
         });
+        
         // update the full user task data
         app.put('/allTasks/:id', async(req, res) => {
             const id = req.params.id;
