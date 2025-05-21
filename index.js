@@ -25,13 +25,19 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         await client.connect();
+        // Db Collection
         const taskCollection = client.db('AllTasks').collection('tasks');
         const usersCollection = client.db('AllTasks').collection('loggedUser');
+
+        // post user
         app.post('/users', async (req, res) => {
             const userInfo = req.body;
             const result = await usersCollection.insertOne(userInfo);
             res.send(result)
         })
+
+        // user-added uid
+
         app.get('/myPostedTasks/:uid', async (req, res) => {
             const uid = req.params.uid;
             const query = { uid: uid };
@@ -73,7 +79,7 @@ async function run() {
             const result = await taskCollection.findOne(query)
             res.send(result);
         });
-        
+
         // update the full user task data
         app.put('/allTasks/:id', async(req, res) => {
             const id = req.params.id;
