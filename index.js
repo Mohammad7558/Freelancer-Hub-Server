@@ -44,7 +44,7 @@ async function run() {
         app.patch('/allTasks/:id', async (req, res) => {
             const id = req.params.id;
             const updateBidsCount = req.body.bidsCount;
-            const filter = {_id: new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: {
                     bidsCount: updateBidsCount
@@ -54,9 +54,9 @@ async function run() {
             res.send(result)
         });
         // delete userAdded Tasks
-        app.delete('/allTasks/:id', async(req, res) => {
+        app.delete('/allTasks/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await taskCollection.deleteOne(query);
             res.send(result)
         })
@@ -66,21 +66,23 @@ async function run() {
             res.send(result);
         });
         app.get('/allTasks', async (req, res) => {
-            const result = await taskCollection.find({}).sort({ deadline: -1 }).limit(6).toArray();
+            const today = new Date();
+             const todayString = today.toISOString().split('T')[0];
+            const result = await taskCollection.find({ deadline: { $gt: todayString } }).sort({ deadline: 1 }).limit(6).toArray();
             res.send(result);
         });
         app.get('/allTasks/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await taskCollection.findOne(query)
             res.send(result);
         });
 
         // update the full user task data
-        app.put('/allTasks/:id', async(req, res) => {
+        app.put('/allTasks/:id', async (req, res) => {
             const id = req.params.id;
             const newUserData = req.body;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const updateDoc = {
                 $set: newUserData
             }
