@@ -67,14 +67,33 @@ async function run() {
         });
         app.get('/allTasks', async (req, res) => {
             const today = new Date();
-             const todayString = today.toISOString().split('T')[0];
+            const todayString = today.toISOString().split('T')[0];
             const result = await taskCollection.find({ deadline: { $gt: todayString } }).sort({ deadline: 1 }).limit(6).toArray();
             res.send(result);
         });
+
         app.get('/allTasks/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await taskCollection.findOne(query)
+            res.send(result);
+        });
+
+        app.get('/browseTask', async (req, res) => {
+            const { sort } = req.query;
+            let sortOption = {};
+
+            if (sort === 'asc') {
+                sortOption = { deadline: 1 }; // Ascending by deadline
+            } else if (sort === 'desc') {
+                sortOption = { deadline: -1 }; // Descending by deadline
+            } else if (sort === 'bids-asc') {
+                sortOption = { bidsCount: 1 }; // Ascending by bids
+            } else if (sort === 'bids-desc') {
+                sortOption = { bidsCount: -1 }; // Descending by bids
+            }
+
+            const result = await taskCollection.find().sort(sortOption).toArray();
             res.send(result);
         });
 
